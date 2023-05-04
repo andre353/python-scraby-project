@@ -3,6 +3,7 @@ from bookscraper.items import BookItem
 
 class BookspiderSpider(scrapy.Spider):
     name = "bookspider"
+    table_name = "books"
     allowed_domains = ["books.toscrape.com"]
     start_urls = ["http://books.toscrape.com/"]
 
