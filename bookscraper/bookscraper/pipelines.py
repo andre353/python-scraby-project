@@ -7,7 +7,8 @@
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
 import os
-from sqlalchemy import create_engine, text, inspect
+from sqlalchemy import create_engine, text, MetaData
+# from sqlalchemy import create_engine, text, inspect
 
 
 class BookscraperPipeline:
@@ -71,7 +72,6 @@ class BookscraperPipeline:
 
 class SaveToMySQLPipeline:
     def __init__(self, table_name=''):
-      # Getting, but not using currently
         self.table_name = table_name
         db_connection_string = f"mysql+pymysql://{os.getenv('USERNAME')}:{os.getenv('PASSWORD')}@{os.getenv('HOST')}/{os.getenv('DATABASE')}?charset=utf8mb4"
       
@@ -83,6 +83,11 @@ class SaveToMySQLPipeline:
             }
           }
         )
+
+        self.metadata_obj = MetaData()
+        self.metadata_obj.reflect(bind=self.conn)
+        self.active_table = self.metadata_obj.tables['books']
+
 
         with self.conn.connect() as conn:
             # Do not substitute user-supplied database names here.
@@ -111,9 +116,8 @@ class SaveToMySQLPipeline:
         with self.conn.connect() as conn:
             # insp = inspect(self.conn)
             # table_name
-            ## Define insert statement
-            # conn.execute(text(insert_str))
-            conn.execute(self.table_name.insert(), {
+
+            conn.execute(self.active_table.insert(), {
               "url": item['url'],
               "title": item['title'],
               "upc": item['upc'],
