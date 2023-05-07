@@ -107,7 +107,7 @@ from urllib.parse import urlencode
 from random import randint
 import requests
 
-class ScrapeOpsFakeUserAgentMiddleware:
+class ScrapeOpsFakeBrowserHeaderMiddleware:
     @classmethod
     def from_crawler(cls, crawler):
         return cls(crawler.settings)
@@ -115,35 +115,45 @@ class ScrapeOpsFakeUserAgentMiddleware:
     def __init__(self, settings):
         self.scrapeops_api_key = os.getenv('SCRAPEOPS_API_KEY')
         self.scrapeops_endpoint = os.getenv('SCRAPEOPS_FAKE_USER_AGENT_ENDPOINT', 'http://headers.scrapeops.io/v1/user-agents?')
-        self.scrapeops_fake_user_agents_active = os.getenv('SCRAPEOPS_FAKE_USER_AGENT_ENABLED', False)
+        self.scrapeops_fake_user_agents_active = os.getenv('SCRAPEOPS_FAKE_USER_AGENT_ENABLED', True)
         self.scrapeops_num_results = os.getenv('SCRAPEOPS_NUM_RESULTS')
         self.headers_list = []
-        self._get_user_agents_list()
-        self._scrapeops_fake_user_agents_enabled()
+        self._get_headers_list()
+        self._scrapeops_fake_browser_headers_enabled()
 
 
-    def _get_user_agents_list(self):
+    def _get_headers_list(self):
         payload = {'api_key': self.scrapeops_api_key}
         if self.scrapeops_num_results is not None:
             payload['num_headers'] = self.scrapeops_num_results
         response = requests.get(self.scrapeops_endpoint, params=urlencode(payload))
         json_response = response.json()
-        self.user_agents_list = json_response.get('result', [])
+        self.headers_list = json_response.get('result', [])
 
-    def _get_random_user_agent(self):
-        random_index = randint(0, len(self.user_agents_list) - 1)
-        return self.user_agents_list[random_index]
+    def _get_random_browser_header(self):
+        random_index = randint(0, len(self.headers_list) - 1)
+        # print('--------PRINT-----------')
+        # print(self.headers_list[random_index])
+        return self.headers_list[random_index]
 
-    def _scrapeops_fake_user_agents_enabled(self):
+    def _scrapeops_fake_browser_headers_enabled(self):
         if self.scrapeops_api_key is None or self.scrapeops_api_key == '' or self.scrapeops_fake_user_agents_active == False:
             self.scrapeops_fake_user_agents_active = False
         else:
             self.scrapeops_fake_user_agents_active = True
 
     def process_request(self, request, spider):        
-        random_user_agent = self._get_random_user_agent()
-        request.headers['User-Agent'] = random_user_agent
-
-        print("************ NEW HEADER ATTACHED *******")
-        print(request.headers['User-Agent'])
-        
+        random_browser_header = self._get_random_browser_header()
+        # print('--------PRINT-----------')
+        # print(random_browser_header)
+      
+        request.headers['accept-language'] = random_browser_header['accept-language']
+        request.headers['sec-fetch-user'] = random_browser_header['sec-fetch-user'] 
+        request.headers['sec-fetch-mod'] = random_browser_header['sec-fetch-mod'] 
+        request.headers['sec-fetch-site'] = random_browser_header['sec-fetch-site'] 
+        request.headers['sec-ch-ua-platform'] = random_browser_header['sec-ch-ua-platform'] 
+        request.headers['sec-ch-ua-mobile'] = random_browser_header['sec-ch-ua-mobile'] 
+        request.headers['sec-ch-ua'] = random_browser_header['sec-ch-ua'] 
+        request.headers['accept'] = random_browser_header['accept'] 
+        request.headers['user-agent'] = random_browser_header['user-agent'] 
+        request.headers['upgrade-insecure-requests'] = random_browser_header.get('upgrade-insecure-requests')

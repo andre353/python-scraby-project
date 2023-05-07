@@ -114,8 +114,6 @@ class SaveToMySQLPipeline:
       
       
         with self.conn.connect() as conn:
-            # insp = inspect(self.conn)
-            # table_name
 
             conn.execute(self.active_table.insert(), {
               "url": item['url'],

@@ -52,7 +52,7 @@ ROBOTSTXT_OBEY = False
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
    # "bookscraper.middlewares.BookscraperDownloaderMiddleware": 543,
-   "bookscraper.middlewares.ScrapeOpsFakeUserAgentMiddleware": 543,
+   "bookscraper.middlewares.ScrapeOpsFakeBrowserHeaderMiddleware": 543,
 }
 
 # Enable or disable extensions
