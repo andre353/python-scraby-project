@@ -13,6 +13,12 @@ SPIDER_MODULES = ["bookscraper.spiders"]
 NEWSPIDER_MODULE = "bookscraper.spiders"
 
 FEEDS = {'booksdata.json': {'format': 'json'}}
+
+ROTATING_PROXY_LIST = [
+  '75.119.203.42:15745',
+  '170.244.16.45:4145',
+  '206.189.200.62:13110',
+]
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = "bookscraper (+http://www.yourdomain.com)"
 
@@ -53,6 +59,8 @@ ROBOTSTXT_OBEY = False
 DOWNLOADER_MIDDLEWARES = {
    # "bookscraper.middlewares.BookscraperDownloaderMiddleware": 543,
    "bookscraper.middlewares.ScrapeOpsFakeBrowserHeaderMiddleware": 543,
+   "rotating_proxies.middlewares.RotatingProxyMiddleware": 610,
+   "rotating_proxies.middlewares.BanDetectionMiddleware": 620,
 }
 
 # Enable or disable extensions
